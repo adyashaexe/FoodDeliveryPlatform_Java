@@ -1,132 +1,235 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { showToast } from "../App";
 
-const MODE_CONTENT = {
+const CONTENT = {
   login: {
-    title: "Welcome back",
-    subtitle: "Jump into live menus, fast reorders, and real checkout flows.",
-    button: "Login",
-    alternateText: "Need an account?",
-    alternateLink: "/signup",
-    alternateLabel: "Create one",
+    heading: "Welcome back",
+    sub: "Sign in to browse restaurants, track orders, and manage your cart.",
+    btn: "Sign in",
+    alt: "Don't have an account?",
+    altLink: "/signup", altLabel: "Create one",
   },
   signup: {
-    title: "Build your account",
-    subtitle: "Create a customer account and start placing real API-powered orders.",
-    button: "Create account",
-    alternateText: "Already have an account?",
-    alternateLink: "/login",
-    alternateLabel: "Login",
+    heading: "Create account",
+    sub: "Join ByteBite to start ordering from the best restaurants near you.",
+    btn: "Create account",
+    alt: "Already have an account?",
+    altLink: "/login", altLabel: "Sign in",
   },
 };
 
 export default function AuthPage({ mode }) {
-  const config = MODE_CONTENT[mode];
+  const config = CONTENT[mode];
   const navigate = useNavigate();
   const { login, signup } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  function set(field) {
+    return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
     setSubmitting(true);
     setError("");
-
     try {
       if (mode === "login") {
         await login({ email: form.email, password: form.password });
+        showToast("Welcome back! 👋", "success");
       } else {
         await signup(form);
+        showToast("Account created! Let's eat 🍽", "success");
       }
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong while authenticating.");
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <main className="page-shell grid min-h-[calc(100vh-120px)] items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="paper-card relative overflow-hidden p-8 lg:p-12">
-        <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-coral/10 blur-2xl" />
-        <p className="pill inline-block bg-basil/10 text-basil">Full-stack demo</p>
-        <h1 className="mt-6 font-display text-5xl font-bold leading-tight text-ink">
-          Ship a food delivery app that looks and feels production-ready.
-        </h1>
-        <p className="mt-6 max-w-xl text-lg leading-8 text-stone-600">
-          This frontend is wired for JWT auth, live restaurant queries, cart actions, orders, and admin controls.
-        </p>
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          <Stat label="Auth" value="JWT login/signup" />
-          <Stat label="Customer" value="Browse, cart, order" />
-          <Stat label="Admin" value="Restaurant control" />
+    <main style={{
+      minHeight: "calc(100vh - 62px)",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      overflow: "hidden",
+    }}
+      className="auth-grid"
+    >
+      {/* Left panel – brand */}
+      <div style={{
+        background: "var(--ember)",
+        padding: "60px 56px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Decorative circles */}
+        <div style={{
+          position: "absolute", width: 400, height: 400,
+          borderRadius: "50%", border: "1px solid rgba(255,255,255,0.15)",
+          top: -120, right: -120,
+        }} />
+        <div style={{
+          position: "absolute", width: 600, height: 600,
+          borderRadius: "50%", border: "1px solid rgba(255,255,255,0.08)",
+          top: -200, right: -200,
+        }} />
+        <div style={{
+          position: "absolute", width: 300, height: 300,
+          borderRadius: "50%", border: "1px solid rgba(255,255,255,0.12)",
+          bottom: -80, left: -80,
+        }} />
+
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <span style={{
+            fontFamily: "'Fraunces', serif", fontWeight: 900,
+            fontSize: 36, color: "white", letterSpacing: "-0.04em",
+          }}>ByteBite</span>
         </div>
-      </section>
 
-      <section className="paper-card p-8 lg:p-10">
-        <p className="pill inline-block bg-coral/10 text-coral">{mode}</p>
-        <h2 className="mt-4 font-display text-4xl font-bold text-ink">{config.title}</h2>
-        <p className="mt-3 text-sm leading-7 text-stone-600">{config.subtitle}</p>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <p style={{
+            fontFamily: "'Fraunces', serif", fontStyle: "italic",
+            fontWeight: 700, fontSize: "clamp(28px, 3vw, 42px)",
+            color: "white", lineHeight: 1.2, marginBottom: 24,
+          }}>
+            "Good food deserves a great experience."
+          </p>
+          <div style={{ display: "flex", gap: 20 }}>
+            {[["100+", "Restaurants"], ["4.8★", "Avg rating"], ["30 min", "Avg delivery"]].map(([v, l]) => (
+              <div key={l}>
+                <p style={{ fontWeight: 700, fontSize: 22, color: "white", letterSpacing: "-0.03em" }}>{v}</p>
+                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          {mode === "signup" && (
-            <>
-              <input
-                className="soft-input"
-                placeholder="Full name"
-                value={form.name}
-                onChange={(event) => setForm({ ...form, name: event.target.value })}
-              />
-              <input
-                className="soft-input"
-                placeholder="Phone"
-                value={form.phone}
-                onChange={(event) => setForm({ ...form, phone: event.target.value })}
-              />
-            </>
-          )}
+      {/* Right panel – form */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "40px 56px",
+        background: "var(--bg-primary)",
+      }}>
+        <div style={{ width: "100%", maxWidth: 400 }}>
+          <span className="badge badge-muted" style={{ marginBottom: 24, display: "inline-flex" }}>
+            {mode === "login" ? "Sign in" : "Sign up"}
+          </span>
+          <h1 className="display" style={{ fontSize: 36, marginBottom: 10 }}>{config.heading}</h1>
+          <p style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 36, lineHeight: 1.6 }}>
+            {config.sub}
+          </p>
 
-          <input
-            type="email"
-            className="soft-input"
-            placeholder="Email address"
-            value={form.email}
-            onChange={(event) => setForm({ ...form, email: event.target.value })}
-          />
-          <input
-            type="password"
-            className="soft-input"
-            placeholder="Password"
-            value={form.password}
-            onChange={(event) => setForm({ ...form, password: event.target.value })}
-          />
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {mode === "signup" && (
+              <>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", letterSpacing: "0.05em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Full name</label>
+                  <input className="input" placeholder="Adyasha Panda" value={form.name} onChange={set("name")} required />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", letterSpacing: "0.05em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Phone</label>
+                  <input className="input" placeholder="+91 98765 43210" value={form.phone} onChange={set("phone")} />
+                </div>
+              </>
+            )}
 
-          {error && <p className="rounded-2xl bg-berry/10 px-4 py-3 text-sm text-berry">{error}</p>}
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", letterSpacing: "0.05em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Email</label>
+              <input type="email" className="input" placeholder="you@example.com" value={form.email} onChange={set("email")} required />
+            </div>
 
-          <button type="submit" className="primary-button w-full" disabled={submitting}>
-            {submitting ? "Please wait..." : config.button}
-          </button>
-        </form>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", letterSpacing: "0.05em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Password</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPw ? "text" : "password"}
+                  className="input"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={set("password")}
+                  required
+                  style={{ paddingRight: 44 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  style={{
+                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)",
+                    padding: 4,
+                  }}
+                >
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
 
-        <p className="mt-6 text-sm text-stone-500">
-          {config.alternateText}{" "}
-          <Link to={config.alternateLink} className="font-semibold text-coral">
-            {config.alternateLabel}
-          </Link>
-        </p>
-      </section>
+            {error && (
+              <div style={{
+                padding: "12px 16px", background: "rgba(220,38,38,0.08)",
+                border: "1px solid rgba(220,38,38,0.2)", borderRadius: 10,
+                color: "#dc2626", fontSize: 13,
+              }}>
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={submitting}
+              style={{ marginTop: 6, justifyContent: "center", width: "100%", padding: "13px" }}
+            >
+              {submitting ? "Please wait..." : (
+                <>
+                  {config.btn}
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          <p style={{ marginTop: 28, fontSize: 13, color: "var(--text-muted)", textAlign: "center" }}>
+            {config.alt}{" "}
+            <Link to={config.altLink} style={{ color: "var(--ember)", fontWeight: 600, textDecoration: "none" }}>
+              {config.altLabel}
+            </Link>
+          </p>
+
+          {/* Demo credentials */}
+          <div style={{
+            marginTop: 28, padding: "14px 16px",
+            background: "var(--bg-secondary)", border: "1px solid var(--border)",
+            borderRadius: 12, fontSize: 12,
+          }}>
+            <p style={{ fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Demo credentials</p>
+            <p style={{ color: "var(--text-muted)", lineHeight: 1.8 }}>
+              Admin: admin@bytebite.dev / Admin@123<br />
+              User: user@bytebite.dev / User@123
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .auth-grid { grid-template-columns: 1fr !important; }
+          .auth-grid > div:first-child { display: none !important; }
+          .auth-grid > div:last-child { padding: 40px 24px !important; min-height: calc(100vh - 62px); }
+        }
+      `}</style>
     </main>
-  );
-}
-
-function Stat({ label, value }) {
-  return (
-    <div className="rounded-[24px] bg-stone-50 p-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-stone-400">{label}</p>
-      <p className="mt-2 font-semibold text-ink">{value}</p>
-    </div>
   );
 }
