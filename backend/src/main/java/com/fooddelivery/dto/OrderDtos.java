@@ -1,23 +1,19 @@
 package com.fooddelivery.dto;
 
 import jakarta.validation.constraints.NotBlank;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 public final class OrderDtos {
 
-    private OrderDtos() {
-    }
+    private OrderDtos() {}
 
     public record PlaceOrderRequest(
             @NotBlank String deliveryAddress,
             @NotBlank String paymentMethod
-    ) {
-    }
+    ) {}
 
-    public record UpdateOrderStatusRequest(@NotBlank String status) {
-    }
+    public record UpdateOrderStatusRequest(@NotBlank String status) {}
 
     public record OrderItemResponse(
             Long id,
@@ -25,8 +21,7 @@ public final class OrderDtos {
             String name,
             Integer quantity,
             Double price
-    ) {
-    }
+    ) {}
 
     public record OrderResponse(
             Long id,
@@ -42,6 +37,5 @@ public final class OrderDtos {
             LocalDateTime createdAt,
             LocalDateTime estimatedDeliveryAt,
             List<OrderItemResponse> items
-    ) {
-    }
+    ) {}
 }

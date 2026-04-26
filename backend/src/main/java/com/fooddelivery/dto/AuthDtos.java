@@ -6,26 +6,21 @@ import jakarta.validation.constraints.Size;
 
 public final class AuthDtos {
 
-    private AuthDtos() {
-    }
+    private AuthDtos() {}
 
     public record SignupRequest(
             @NotBlank String name,
             @Email @NotBlank String email,
             @NotBlank @Size(min = 6) String password,
             String phone
-    ) {
-    }
+    ) {}
 
     public record LoginRequest(
             @Email @NotBlank String email,
             @NotBlank String password
-    ) {
-    }
+    ) {}
 
-    public record UserResponse(Long id, String name, String email, String phone, String role) {
-    }
+    public record UserResponse(Long id, String name, String email, String phone, String role) {}
 
-    public record AuthResponse(String token, UserResponse user) {
-    }
+    public record AuthResponse(String token, UserResponse user) {}
 }

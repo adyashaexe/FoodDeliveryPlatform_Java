@@ -2,22 +2,18 @@ package com.fooddelivery.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 
 public final class CartDtos {
 
-    private CartDtos() {
-    }
+    private CartDtos() {}
 
     public record AddCartItemRequest(
             @NotNull Long menuItemId,
             @NotNull @Min(1) Integer quantity
-    ) {
-    }
+    ) {}
 
-    public record UpdateCartItemRequest(@NotNull @Min(1) Integer quantity) {
-    }
+    public record UpdateCartItemRequest(@NotNull @Min(0) Integer quantity) {}
 
     public record CartItemResponse(
             Long id,
@@ -27,8 +23,7 @@ public final class CartDtos {
             Double unitPrice,
             Integer quantity,
             Double lineTotal
-    ) {
-    }
+    ) {}
 
     public record CartResponse(
             Long id,
@@ -38,6 +33,5 @@ public final class CartDtos {
             Double subtotal,
             Double deliveryFee,
             Double total
-    ) {
-    }
+    ) {}
 }
